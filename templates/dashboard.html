@@ -1,0 +1,10 @@
+{% extends "totp_2fa/base.html" %}
+{% block content %}
+<h1>Protected dashboard</h1>
+<p>You have completed all required login stages. 2FA is {{ 'enabled' if enabled else 'disabled' }}.</p>
+<p><a href="{{ url_for('totp_2fa.disable' if enabled else 'totp_2fa.setup') }}">{{ 'Disable 2FA' if enabled else 'Set up 2FA' }}</a></p>
+<form method="post" action="{{ url_for('logout') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button>Log out</button>
+</form>
+{% endblock %}

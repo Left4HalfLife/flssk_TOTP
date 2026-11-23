@@ -1,0 +1,17 @@
+{% extends "user_auth/base.html" %}
+{% block content %}
+<h1>Sign in</h1>
+<p class="muted">Use a passkey, or your password followed by an authenticator code.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<div class="card">
+  <button type="button" data-passkey="login"
+    data-options="{{ url_for('user_auth.passkey_options') }}"
+    data-complete="{{ url_for('user_auth.passkey_complete') }}">Sign in with a passkey</button>
+</div>
+<form method="post" class="card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Username <input name="username" autocomplete="username" maxlength="64" required autofocus></label>
+  <label>Password <input name="password" type="password" autocomplete="current-password" maxlength="128" required></label>
+  <button>Continue with password</button>
+</form>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "totp_2fa/base.html" %}
+{% block content %}
+<h1>Set up two-factor authentication</h1>
+{% if enrollment %}
+<p>Scan this QR code with your authenticator. Enrollment expires after 10 minutes.</p>
+<img src="{{ enrollment.qr_data_uri }}" alt="Authenticator enrollment QR code">
+<p>Manual-entry secret: <code>{{ enrollment.secret }}</code></p>
+<form method="post" action="{{ url_for('totp_2fa.confirm') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Authenticator code <input name="code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" required></label>
+  <button>Confirm enrollment</button>
+</form>
+{% else %}
+<p>Your current login remains usable until you confirm a valid authenticator code.</p>
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button>Generate enrollment QR code</button>
+</form>
+{% endif %}
+{% endblock %}

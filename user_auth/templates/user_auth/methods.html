@@ -1,0 +1,34 @@
+{% extends "user_auth/base.html" %}
+{% block content %}
+<h1>{{ 'Set up your sign-in methods' if login.phase == 'enroll' else 'Security methods' }}</h1>
+<p>Choose TOTP, a passkey, or both. Future logins require a passkey OR password + TOTP.</p>
+{% if login.phase == 'enroll' %}<p>You cannot access the dashboard or admin tools until you confirm a method.</p>{% endif %}
+<div class="card">
+  <h2>Authenticator (TOTP)</h2>
+  {% if totp_enabled %}
+  <p>Enabled. Your password is followed by an authenticator or recovery code.</p>
+  <form method="post" action="{{ url_for('user_auth.remove_method') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="method" value="totp"><button class="danger">Remove TOTP</button>
+  </form>
+  {% else %}<a href="{{ url_for('user_auth.totp_setup') }}">Set up authenticator</a>{% endif %}
+</div>
+<div class="card">
+  <h2>Passkeys</h2>
+  {% for key in passkeys %}
+  <p>{{ key.name }}</p>
+  <form method="post" action="{{ url_for('user_auth.remove_method') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="method" value="passkey">
+    <input type="hidden" name="credential_id" value="{{ key.credential_id }}">
+    <button class="danger">Remove this passkey</button>
+  </form>
+  {% else %}<p>No passkeys registered.</p>{% endfor %}
+  <label>Passkey name <input id="passkey-name" maxlength="64" value="My passkey"></label>
+  <button type="button" data-passkey="register"
+    data-options="{{ url_for('user_auth.register_options') }}"
+    data-complete="{{ url_for('user_auth.register_complete') }}">Add a passkey</button>
+  <p class="muted">Requires browser/device support and verification with your device PIN or biometrics. HTTPS is required except on localhost.</p>
+</div>
+<p>Method changes require a login within the last five minutes and revoke previous sessions. You cannot remove your last method yourself.</p>
+{% endblock %}
