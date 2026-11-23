@@ -1,0 +1,8 @@
+{% extends "user_auth/base.html" %}
+{% block content %}
+<h1>TOTP enabled</h1>
+<p>Save these single-use recovery codes now. They will not be displayed again.</p>
+<ul>{% for code in backup_codes %}<li><code>{{ code }}</code></li>{% endfor %}</ul>
+<p>Wait for the next authenticator code before logging in again.</p>
+<a href="{{ url_for('user_auth.methods') }}">Manage methods or add a passkey</a>
+{% endblock %}

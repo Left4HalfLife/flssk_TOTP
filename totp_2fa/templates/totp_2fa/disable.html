@@ -1,0 +1,11 @@
+{% extends "totp_2fa/base.html" %}
+{% block content %}
+<h1>Disable two-factor authentication</h1>
+<p>Confirm with your current password OR an unused authenticator/recovery code.</p>
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Current password <input name="password" type="password" autocomplete="current-password"></label>
+  <label>Authenticator or recovery code <input name="code" maxlength="200" autocomplete="one-time-code"></label>
+  <button>Disable 2FA</button>
+</form>
+{% endblock %}

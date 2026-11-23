@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flask-totp-reference"
+version = "0.1.0"
+description = "Reusable Flask TOTP authentication blueprint and SQLite reference"
+requires-python = ">=3.10"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+include = ["totp_2fa*", "user_auth*"]
+
+[tool.setuptools.package-data]
+totp_2fa = ["templates/totp_2fa/*.html", "README.md"]
+user_auth = ["templates/user_auth/*.html", "static/*.js", "README.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

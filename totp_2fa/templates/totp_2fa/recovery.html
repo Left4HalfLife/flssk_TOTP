@@ -1,0 +1,7 @@
+{% extends "totp_2fa/base.html" %}
+{% block content %}
+<h1>2FA enabled</h1>
+<p>Save these recovery codes in a safe place now. They are displayed only once; each code can be used only once.</p>
+<ul>{% for code in backup_codes %}<li><code>{{ code }}</code></li>{% endfor %}</ul>
+<p>The enrollment code has been consumed. Wait for a new code before your next login.</p>
+{% endblock %}

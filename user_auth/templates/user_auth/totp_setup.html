@@ -1,0 +1,16 @@
+{% extends "user_auth/base.html" %}
+{% block content %}
+<h1>Set up an authenticator</h1>
+{% if enrollment %}
+<p>Scan this local QR code. The pending secret expires after ten minutes.</p>
+<img src="{{ enrollment.qr_data_uri }}" alt="TOTP enrollment QR">
+<p>Manual-entry secret: <code>{{ enrollment.secret }}</code></p>
+<form method="post" action="{{ url_for('user_auth.totp_confirm') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Authenticator code <input name="code" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" required></label>
+  <button>Confirm TOTP</button>
+</form>
+{% else %}
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button>Generate QR code</button></form>
+{% endif %}
+{% endblock %}

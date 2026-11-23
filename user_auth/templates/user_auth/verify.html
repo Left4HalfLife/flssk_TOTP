@@ -1,0 +1,10 @@
+{% extends "user_auth/base.html" %}
+{% block content %}
+<h1>Complete your login</h1>
+<p>Enter your authenticator's six-digit code or a single-use recovery code.</p>
+<form method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label>Code <input name="code" autocomplete="one-time-code" maxlength="200" required autofocus></label>
+  <button>Verify</button>
+</form>
+{% endblock %}

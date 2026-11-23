@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}Account security{% endblock %}</title>
+  <style>
+    body { font: 1rem/1.6 system-ui, sans-serif; color: #172434; background: #f3f6fa; margin: 0; }
+    main { max-width: 74rem; margin: 2rem auto; padding: 2rem; background: white; border-radius: 1rem; }
+    nav { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; border-bottom: 1px solid #ddd; padding-bottom: 1rem; }
+    nav form { margin-left: auto; }
+    input, button { font: inherit; padding: .5rem .8rem; border: 1px solid #bac3ce; border-radius: .4rem; }
+    button { cursor: pointer; background: #eef3fb; }
+    label { display: block; margin: 1rem 0; }
+    input { max-width: 100%; box-sizing: border-box; }
+    .card { padding: 1.2rem; margin: 1rem 0; border: 1px solid #ddd; border-radius: .6rem; }
+    .error { color: #a00; }
+    .muted { color: #526071; }
+    .danger { color: #a00; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #ddd; text-align: left; padding: .75rem; vertical-align: top; }
+    td form { margin: .5rem 0; }
+    .table-scroll { overflow-x: auto; }
+    img { max-width: 100%; }
+    code { overflow-wrap: anywhere; }
+  </style>
+  <script src="{{ url_for('user_auth.static', filename='passkeys.js') }}" defer></script>
+</head>
+<body>
+<main>
+  <nav>
+    <strong>Flask Accounts</strong>
+    {% if g.login %}
+      <span>{{ g.login.user.username }}</span>
+      {% if g.login.phase == 'full' %}
+        <a href="{{ url_for('user_auth.dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('user_auth.methods') }}">Security methods</a>
+        <a href="{{ url_for('user_auth.password_change') }}">Password</a>
+        {% if g.login.user.is_admin %}<a href="{{ url_for('user_auth.admin_users') }}">Users</a>{% endif %}
+      {% endif %}
+      <form method="post" action="{{ url_for('user_auth.logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button>Log out</button>
+      </form>
+    {% endif %}
+  </nav>
+  {% block content %}{% endblock %}
+  <p id="passkey-error" class="error" role="alert"></p>
+</main>
+</body>
+</html>

@@ -1,0 +1,66 @@
+{% extends "user_auth/base.html" %}
+{% block content %}
+<h1>User management</h1>
+<p>Administrative changes require authentication within the last five minutes. Changes revoke the affected user's sessions.</p>
+<form method="post" class="card">
+  <h2>Create user</h2>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="hidden" name="action" value="create">
+  <label>Username <input name="username" pattern="[A-Za-z0-9_.-]{3,64}" required></label>
+  <label>Temporary password <input name="temporary_password" type="password" minlength="12" maxlength="128" autocomplete="new-password" required></label>
+  <label><input type="checkbox" name="is_admin" value="1"> Administrator</label>
+  <button>Create user (password change required)</button>
+</form>
+<div class="table-scroll"><table>
+  <thead><tr><th>User</th><th>Authentication methods</th><th>Actions</th></tr></thead>
+  <tbody>
+  {% for user in users %}
+  <tr>
+    <td><strong>{{ user.username }}</strong><br>{{ 'Admin' if user.is_admin else 'User' }}<br>
+      <small>{{ user.id }}</small><br>
+      {{ 'Password change required' if user.require_password_change else 'Password current' }}
+      {% if not user.totp and not user.passkeys and not user.enrollment_allowed %}<p class="danger">Locked: admin reset required</p>{% endif %}
+    </td>
+    <td>
+      {% if user.totp %}
+      <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="remove_method">
+        <input type="hidden" name="user_id" value="{{ user.id }}"><input type="hidden" name="method" value="totp">
+        <button class="danger">Revoke TOTP</button>
+      </form>
+      {% else %}<p>No TOTP</p>{% endif %}
+      {% for key in user.passkeys %}
+      <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="remove_method">
+        <input type="hidden" name="user_id" value="{{ user.id }}"><input type="hidden" name="method" value="passkey">
+        <input type="hidden" name="credential_id" value="{{ key.credential_id }}">
+        <button class="danger">Revoke {{ key.name }}</button>
+      </form>
+      {% else %}<p>No passkeys</p>{% endfor %}
+    </td>
+    <td>
+      <form method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="force_password">
+        <input type="hidden" name="user_id" value="{{ user.id }}"><button>Force password change</button>
+      </form>
+      {% if user.id != login.user.id %}
+      <details><summary>Reset account / delete</summary>
+        <p class="danger">Reset removes ALL methods and grants restricted onboarding with a new temporary password. Deliver it through a trusted channel.</p>
+        <form method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="reset">
+          <input type="hidden" name="user_id" value="{{ user.id }}">
+          <label>New temporary password <input type="password" name="temporary_password" minlength="12" maxlength="128" autocomplete="new-password" required></label>
+          <button class="danger">Reset credentials and onboarding</button>
+        </form>
+        <form method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="action" value="delete">
+          <input type="hidden" name="user_id" value="{{ user.id }}"><button class="danger">Permanently delete user</button>
+        </form>
+      </details>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table></div>
+{% endblock %}
